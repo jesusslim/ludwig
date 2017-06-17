@@ -22,9 +22,9 @@ class Engine
 
     protected $injector;
 
-    public function __construct()
+    public function __construct(Container $container = null)
     {
-        $this->injector = new Container();
+        $this->injector = $container ? $container : new Container();
     }
 
     /**
