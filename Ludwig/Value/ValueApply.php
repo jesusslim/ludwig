@@ -39,16 +39,26 @@ class ValueApply
         $this->injector = $injector;
     }
 
+    /**
+     * @param $values
+     * @return array|mixed
+     */
     public function apply($values){
         $result = [];
-        foreach ($values as $key => $info){
-            if ($info['type'] == Ludwig::APPLY_VALUE_TYPE_MAGIC){
-                /* @var $value_column ValueInterface */
-                $value_column = $this->getInjector()->produce($info['value']);
-                $result[$key] = $value_column->getValue();
-            }else{
-                $result[$key] = $info['value'];
+        if (is_array($values)){
+            foreach ($values as $key => $info){
+                if ($info['type'] == Ludwig::APPLY_VALUE_TYPE_MAGIC){
+                    /* @var $value ValueInterface */
+                    $value = $this->getInjector()->produce($info['value']);
+                    $result[$key] = $value->getValue();
+                }else{
+                    $result[$key] = $info['value'];
+                }
             }
+        }else{
+            /* @var $value ValueInterface */
+            $value = $this->getInjector()->produce($values);
+            $result = $value->getValue();
         }
         return $result;
     }
