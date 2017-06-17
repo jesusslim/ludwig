@@ -11,15 +11,6 @@ namespace Ludwig;
 class Engine
 {
 
-    const CONDITION_TYPE_COMMON = 1;
-    const CONDITION_TYPE_LOGIC = 2;
-
-    const LOGIC_AND = 1;
-    const LOGIC_OR = 2;
-
-    const CONDITION_VALUE_TYPE_COMMON = 1;
-    const CONDITION_VALUE_TYPE_MAGIC = 2;
-
     protected $injector;
 
     public function __construct(Container $container = null)
@@ -62,7 +53,7 @@ class Engine
     public function walk($condition_values){
         $r = [];
         foreach ($condition_values as $key => $info){
-            if ($info['type'] == self::CONDITION_VALUE_TYPE_MAGIC){
+            if ($info['type'] == Ludwig::CONDITION_VALUE_TYPE_MAGIC){
                 /* @var $value_column ColumnInterface */
                 $value_column = $this->getInjector()->produce($info['value']);
                 $r[$key] = $value_column->getValue();
@@ -79,16 +70,16 @@ class Engine
      * @param int $logic
      * @return bool
      */
-    public function run($conditions,$logic = self::LOGIC_AND){
+    public function run($conditions,$logic = Ludwig::CONDITION_LOGIC_AND){
         $r = false;
         foreach ($conditions as $condition){
-            if ($condition['condition_type'] == self::CONDITION_TYPE_LOGIC){
+            if ($condition['condition_type'] == Ludwig::CONDITION_TYPE_LOGIC){
                 $r = $this->run($condition['sons'],$condition['logic']);
             }else{
                 $r = $this->is($condition['column'],$condition['func'],$condition['condition_values']);
             }
-            if ($logic == self::LOGIC_AND && $r === false) return false;
-            if ($logic == self::LOGIC_OR && $r === true) return true;
+            if ($logic == Ludwig::CONDITION_LOGIC_AND && $r === false) return false;
+            if ($logic == Ludwig::CONDITION_LOGIC_OR && $r === true) return true;
         }
         return $r;
     }
