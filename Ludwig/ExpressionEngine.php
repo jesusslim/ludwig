@@ -76,12 +76,76 @@ class ExpressionEngine
     protected $columns_map;
 
     /**
+     * 分隔符
+     * @var string
+     */
+    protected $separator;
+
+    /**
+     * 字符替换map
+     * @var array
+     */
+    protected $replace_map;
+
+    /**
      * ExpressionEngine constructor.
      * @param array $columns_map
+     * @param string $separator
+     * @param array $replace_map
      */
-    public function __construct($columns_map = [])
+    public function __construct($columns_map = [],$separator = ' ',$replace_map = [])
     {
         $this->columns_map = $columns_map;
+        $this->separator = $separator;
+        $this->replace_map = $replace_map;
+    }
+
+    /**
+     * @return array
+     */
+    public function getColumnsMap()
+    {
+        return $this->columns_map;
+    }
+
+    /**
+     * @param array $columns_map
+     */
+    public function setColumnsMap($columns_map)
+    {
+        $this->columns_map = $columns_map;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSeparator()
+    {
+        return $this->separator;
+    }
+
+    /**
+     * @param string $separator
+     */
+    public function setSeparator($separator)
+    {
+        $this->separator = $separator;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReplaceMap()
+    {
+        return $this->replace_map;
+    }
+
+    /**
+     * @param array $replace_map
+     */
+    public function setReplaceMap($replace_map)
+    {
+        $this->replace_map = $replace_map;
     }
 
     /**
@@ -118,8 +182,8 @@ class ExpressionEngine
      * @return array
      */
     public function convert($str){
-        $str = str_replace(')',' ) ',str_replace('(',' ( ',$str));
-        $arr = explode(' ',$str);
+        $str = str_replace(')',$this->separator.')'.$this->separator,str_replace('(',$this->separator.'('.$this->separator,$str));
+        $arr = explode($this->separator,$str);
         $real = [];
         $stack = new \SplStack();
         foreach ($arr as $item){
@@ -143,6 +207,9 @@ class ExpressionEngine
                 }
                 $stack->push($item);
             }else{
+                foreach ($this->replace_map as $k => $rep){
+                    $item = str_replace($k,$rep,$item);
+                }
                 $real[] = $item;
             }
         }
